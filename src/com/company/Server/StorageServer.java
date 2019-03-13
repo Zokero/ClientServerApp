@@ -5,10 +5,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 public class StorageServer {
+    private static final Logger LOGGER = Logger.getLogger(StorageServer.class.getName());
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("Usage: java StorageServer <port number>");
             System.exit(1);
@@ -20,7 +22,7 @@ public class StorageServer {
         try (ServerSocket listener = new ServerSocket(portNumber)) {
             executor = Executors.newFixedThreadPool(5);
             System.out.println("StorageServer is running...");
-            while(true){
+            while (true) {
                 Socket socket = listener.accept();
                 Runnable worker = new RequestHandler(socket);
                 executor.execute(worker);
@@ -29,8 +31,8 @@ public class StorageServer {
             System.out.println("Exception caught when trying to listen on port"
                     + portNumber + " or listening for a connection");
             System.out.println(e.getMessage());
-        }finally {
-            if(executor != null){
+        } finally {
+            if (executor != null) {
                 executor.shutdown();
             }
         }

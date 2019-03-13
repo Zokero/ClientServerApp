@@ -6,32 +6,35 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
+
 
 public class DbxClient {
+    private static final Logger LOGGER = Logger.getLogger(DbxClient.class.getName());
 
     public static void main(String[] args) throws IOException {
-        if(args.length != 2){
-            System.err.println("Usage: java DbxClient <host name> <port number>");
+        if (args.length != 2) {
+            LOGGER.warning("Usage: java DbxClient <host name> <directory>");
             System.exit(1);
         }
         String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+        String folderPath = args[1];
 
-        try(Socket clientSocket = new Socket(hostName,portNumber)){
+        try (Socket clientSocket = new Socket(hostName, 5555)) {
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-            String userInput;
-            while((userInput = stdIn.readLine()) != null){
-                out.println(userInput);
-                //System.out.println("echo: " + in.readLine());
-            }
+            out.println(folderPath);
+            out.println(hostName);
+            System.out.println(in.readLine());
+            System.out.println(in.readLine());
+            while (true) {
 
-        }catch (UnknownHostException e){
-            System.err.println("Don't know about host " + hostName);
+            }
+        } catch (UnknownHostException e) {
+            LOGGER.warning("Don't know about host " + hostName);
             System.exit(1);
-        }catch (IOException e){
-            System.err.println("Couldn't get I/O for this connection to " + hostName);
+        } catch (IOException e) {
+            LOGGER.warning("Couldn't get I/O for this connection to " + hostName);
             System.exit(1);
         }
     }
