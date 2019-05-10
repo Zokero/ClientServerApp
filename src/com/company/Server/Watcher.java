@@ -12,19 +12,13 @@ public class Watcher {
 
     public static void watchDirectory(String userName, Path path) {
 
-        try {
-            Boolean isFolder = (Boolean) Files.getAttribute(path, "basic:isDirectory", LinkOption.NOFOLLOW_LINKS);
-            if (!isFolder) {
-                throw new IllegalArgumentException("Path " + path + " is not a folder");
-            }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-        LOGGER.info("TEST");
-        LOGGER.info("Watching path xxx " + path);
-        FileSystem fs = path.getFileSystem();
 
-        try (WatchService watchService = fs.newWatchService()) {
+        LOGGER.info("Check Path");
+        checkIfPathPointsToFolder(path);
+        LOGGER.info("Watching path " + path);
+        FileSystem fileSystem = path.getFileSystem();
+
+        try (WatchService watchService = fileSystem.newWatchService()) {
             path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
             WatchKey key;
             while (true) {
@@ -38,6 +32,7 @@ public class Watcher {
                         Path newPath = ((WatchEvent<Path>) watchEvent).context();
                         System.out.println("New file created " + newPath + " for " + userName);
                         Path fPath = Paths.get(path + "\\" + newPath);
+                        System.out.println(Thread.currentThread().getId());
                         Path sPath = Paths.get("E:\\git-repos\\ClientServerApp\\src\\com\\company\\Server\\ServerFolders\\1\\" + newPath);
                         Files.copy(fPath, sPath, REPLACE_EXISTING);
                     } else if (ENTRY_MODIFY == kind) {
@@ -52,10 +47,21 @@ public class Watcher {
                     break;
                 }
             }
-        } catch (IOException e) {
-            System.out.println("IO Exception");
-        } catch (InterruptedException e) {
-            System.out.println("InterruptedException");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
+    public static void checkIfPathPointsToFolder(Path path){
+        try {
+            Boolean isFolder = (Boolean) Files.getAttribute(path, "basic:isDirectory", LinkOption.NOFOLLOW_LINKS);
+            if (!isFolder) {
+                throw new IllegalArgumentException("Path " + path + " is not a folder");
+            }else{
+                System.out.println("Path is pointing to folder directory");
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 }

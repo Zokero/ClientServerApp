@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class DbxClient {
     private static final Logger LOGGER = Logger.getLogger(DbxClient.class.getName());
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if (args.length != 2) {
             LOGGER.warning("Usage: java DbxClient <host name> <directory>");
             System.exit(1);
@@ -25,7 +25,6 @@ public class DbxClient {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out.println(folderPath);
             out.println(hostName);
-            System.out.println(in.readLine());
             System.out.println(in.readLine());
             while (true) {
 

@@ -31,8 +31,6 @@ public class RequestHandler implements Runnable {
             }
         } catch (IOException e) {
             System.out.println("I/O exception: " + e);
-        } catch (Exception ex) {
-            System.out.println("Exception in Thread Run, Exception : " + ex);
         }
     }
 }
