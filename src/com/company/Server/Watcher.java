@@ -33,7 +33,8 @@ public class Watcher {
                         System.out.println("New file created " + newPath + " for " + userName);
                         Path fPath = Paths.get(path + "\\" + newPath);
                         System.out.println(Thread.currentThread().getId());
-                        Path sPath = Paths.get("E:\\git-repos\\ClientServerApp\\src\\com\\company\\Server\\ServerFolders\\1\\" + newPath);
+                        //Path sPath = Paths.get("E:\\git-repos\\ClientServerApp\\src\\com\\company\\Server\\ServerFolders\\1\\" + newPath);
+                        Path sPath = Paths.get("C:\\Users\\pikuk1\\Documents\\git-repos\\ClientServerApp\\src\\com\\company\\Client\\ClientLocalFolders\\1\\" + newPath);
                         Files.copy(fPath, sPath, REPLACE_EXISTING);
                     } else if (ENTRY_MODIFY == kind) {
                         Path newPath = ((WatchEvent<Path>) watchEvent).context();
@@ -63,5 +64,4 @@ public class Watcher {
             System.out.println(e.getMessage());
         }
     }
-
 }
