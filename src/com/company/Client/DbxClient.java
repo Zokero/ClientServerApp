@@ -1,11 +1,11 @@
 package com.company.Client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import com.company.Server.Watcher;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 
@@ -19,16 +19,18 @@ public class DbxClient {
         }
         String hostName = args[0];
         String folderPath = args[1];
-
         try (Socket clientSocket = new Socket(hostName, 5555)) {
+            clientSocket.setKeepAlive(true);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
             out.println(folderPath);
             out.println(hostName);
             System.out.println(in.readLine());
-            while (true) {
+            Watcher.watchDirectory(hostName, Paths.get(folderPath), clientSocket);
+            // while (true) {
 
-            }
+            // }
         } catch (UnknownHostException e) {
             LOGGER.warning("Don't know about host " + hostName);
             System.exit(1);

@@ -1,17 +1,19 @@
 package com.company.Server;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.file.*;
 import java.util.logging.Logger;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Watcher {
     private static final Logger LOGGER = Logger.getLogger(Watcher.class.getName());
 
-    public static void watchDirectory(String userName, Path path) {
-
+    public static void watchDirectory(String userName, Path path, Socket socket) {
 
         LOGGER.info("Check Path");
         checkIfPathPointsToFolder(path);
@@ -31,14 +33,7 @@ public class Watcher {
                     } else if (ENTRY_CREATE == kind) {
                         Path newPath = ((WatchEvent<Path>) watchEvent).context();
                         System.out.println("New file created " + newPath + " for " + userName);
-                        Path fPath = Paths.get(path + "\\" + newPath);
-                        System.out.println(Thread.currentThread().getId());
-                        //Path sPath = Paths.get("E:\\git-repos\\ClientServerApp\\src\\com\\company\\Server\\ServerFolders\\1\\" + newPath);
-                        Path sPath = Paths.get("C:\\Users\\pikuk1\\Documents\\git-repos\\ClientServerApp\\src\\com\\company\\Client\\ClientLocalFolders\\1\\" + newPath);
-                        Files.copy(fPath, sPath, REPLACE_EXISTING);
-                    } else if (ENTRY_MODIFY == kind) {
-                        Path newPath = ((WatchEvent<Path>) watchEvent).context();
-                        System.out.println("Modified file " + newPath + " for " + userName);
+                        sendFileOnServer(socket, path + "\\" + newPath.toString(), newPath.toString());
                     } else if (ENTRY_DELETE == kind) {
                         Path newPath = ((WatchEvent<Path>) watchEvent).context();
                         System.out.println("Deleted file " + newPath + " for " + userName);
@@ -52,16 +47,33 @@ public class Watcher {
             e.printStackTrace();
         }
     }
-    public static void checkIfPathPointsToFolder(Path path){
+
+    public static void checkIfPathPointsToFolder(Path path) {
         try {
             Boolean isFolder = (Boolean) Files.getAttribute(path, "basic:isDirectory", LinkOption.NOFOLLOW_LINKS);
             if (!isFolder) {
                 throw new IllegalArgumentException("Path " + path + " is not a folder");
-            }else{
+            } else {
                 System.out.println("Path is pointing to folder directory");
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void sendFileOnServer(Socket socket, String file, String name) throws IOException {
+        System.out.println(file);
+
+        DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+        FileInputStream fis = new FileInputStream(new File(file));
+        byte[] buffer = new byte[4096];
+        dos.writeUTF(name);
+
+        while (fis.read(buffer) > 0) {
+            dos.write(buffer);
+        }
+
+        fis.close();
+        dos.flush();
     }
 }
