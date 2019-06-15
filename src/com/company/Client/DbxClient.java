@@ -19,24 +19,24 @@ public class DbxClient {
         }
         String hostName = args[0];
         String folderPath = args[1];
-        try (Socket clientSocket = new Socket(hostName, 5555)) {
-            clientSocket.setKeepAlive(true);
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-            out.println(folderPath);
-            out.println(hostName);
-            System.out.println(in.readLine());
-            Watcher.watchDirectory(hostName, Paths.get(folderPath), clientSocket);
+        //try (Socket clientSocket = new Socket(hostName, 5555)) {
+            //clientSocket.setKeepAlive(true);
+//            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+//            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//
+//            out.println(folderPath);
+//            out.println(hostName);
+//            System.out.println(in.readLine());
+            Watcher.watchDirectory(hostName, Paths.get(folderPath));
             // while (true) {
 
             // }
-        } catch (UnknownHostException e) {
-            LOGGER.warning("Don't know about host " + hostName);
-            System.exit(1);
-        } catch (IOException e) {
-            LOGGER.warning("Couldn't get I/O for this connection to " + hostName);
-            System.exit(1);
-        }
+//        } catch (UnknownHostException e) {
+//            LOGGER.warning("Don't know about host " + hostName);
+//            System.exit(1);
+//        } catch (IOException e) {
+//            LOGGER.warning("Couldn't get I/O for this connection to " + hostName);
+//            System.exit(1);
+//        }
     }
 }

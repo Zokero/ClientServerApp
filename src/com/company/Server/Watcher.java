@@ -13,7 +13,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 public class Watcher {
     private static final Logger LOGGER = Logger.getLogger(Watcher.class.getName());
 
-    public static void watchDirectory(String userName, Path path, Socket socket) {
+    public static void watchDirectory(String userName, Path path) {
 
         LOGGER.info("Check Path");
         checkIfPathPointsToFolder(path);
@@ -31,9 +31,10 @@ public class Watcher {
                     if (OVERFLOW == kind) {
                         continue;
                     } else if (ENTRY_CREATE == kind) {
+                        Socket soc = new Socket(userName, 5555 );
                         Path newPath = ((WatchEvent<Path>) watchEvent).context();
                         System.out.println("New file created " + newPath + " for " + userName);
-                        sendFileOnServer(socket, path + "\\" + newPath.toString(), newPath.toString());
+                        sendFileOnServer(soc, path + "\\" + newPath.toString(), newPath.toString());
                     } else if (ENTRY_DELETE == kind) {
                         Path newPath = ((WatchEvent<Path>) watchEvent).context();
                         System.out.println("Deleted file " + newPath + " for " + userName);
@@ -63,10 +64,10 @@ public class Watcher {
 
     public static void sendFileOnServer(Socket socket, String file, String name) throws IOException {
         System.out.println(file);
-
+        File fileToSend = new File(file);
         DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-        FileInputStream fis = new FileInputStream(new File(file));
-        byte[] buffer = new byte[4096];
+        FileInputStream fis = new FileInputStream(fileToSend);
+        byte[] buffer = new byte[(int)fileToSend.length()];
         dos.writeUTF(name);
 
         while (fis.read(buffer) > 0) {
@@ -74,6 +75,7 @@ public class Watcher {
         }
 
         fis.close();
-        dos.flush();
+        dos.close();
+        //socket.close();
     }
 }
